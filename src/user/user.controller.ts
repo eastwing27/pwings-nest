@@ -9,9 +9,9 @@ export class UserController {
 
     @Post('register')
     async register(@Body() dto: UserDTO, @Res() response) {
-        return await this.userService.create(dto)
+        return await (this.userService.create(dto))
             .then(
-                () => response.status(200),
+                doc => response.status(200).send(doc),
                 err => response.status(400).send({message: err}));
     }
 }
