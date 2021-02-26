@@ -14,19 +14,79 @@ export class UserService {
 
     findAll(): Promise<User[]> { return this.repository.find(); }
 
-    findById(id: number): Promise<User> { return this.repository.findOne(id) }
-    findByEmail(email: string): Promise<User> { return this.repository.findOne({email: email}) }
+    find(promise: Promise<User>): Promise<User|string> { 
+        return new Promise<User> (async (resolve, reject) => { 
+            const user = await promise;
+            if (!user)
+                return reject("No user found");
+            
+            return resolve(user);
+        })
+    }
 
-    async create(dto: UserDTO): Promise<User|string> { 
-        //await this.repository.create(dto)
-        return await new Promise<User|string>(async (resolve, reject) => {
+    findById(id: number): Promise<User|string> {
+        return this.find(this.repository.findOne({id: id}));
+    }
+
+    findByEmail(email: string): Promise<User|string> {
+        return this.find(this.repository.findOne({email: email}));
+    }
+
+    create(dto: UserDTO): Promise<User|string> { 
+        return new Promise<User|string>(async (resolve, reject) => {
                 if(!dto || IsNullOrWhiteSpace(dto.email) || IsNullOrWhiteSpace(dto.password))
                     return reject("Invalid user data");
 
-                var user = await this.repository.create(dto);
-                return resolve(user);
+                try{
+                    const user = await this.repository.create(dto);
+                    await this.repository.save(user);
+                    return resolve(user);
+                }
+                catch (err){
+                    return reject(err.message || err);
+                }
         }) 
     }
 
-    async delete(id: number): Promise<void> { await this.repository.delete(id) }
+    refill(userId: number, amount: number): Promise<number|string> {
+        return new Promise<number|string>(async (resolve, reject) => {
+            if (!userId || !Number.isInteger(+userId))
+                return reject("Invalid user ID");
+
+            if (!amount || !Number.isInteger(+amount) || +amount < 1)
+                return reject("Invalid amount value");
+
+            try {
+                const user = await this.repository.findOne({id: +userId});
+                if (!user)
+                    return reject(`User #${userId} not found`);
+
+                user.balance += amount;
+                await this.repository.save(user);
+                return resolve(user.balance);
+            }
+            catch (err){
+                return reject(err.message || err);
+            }
+        })
+    }
+
+    delete(id: number): Promise<string> { 
+        return new Promise<string> (async (resolve, reject) => {
+            if (!id || !Number.isInteger(+id))
+                return reject("Invalid user ID");
+
+            try {
+                const user = await this.repository.findOne({id: +id});
+                if (!user)
+                    return reject(`User #${id} not found`);
+
+                await this.repository.remove(user);
+                return resolve("ok");
+            }
+            catch(err){
+                return reject(err.message || err);
+            }
+        });
+    }
 }

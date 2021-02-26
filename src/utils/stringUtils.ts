@@ -1,3 +1,3 @@
 export function IsNullOrWhiteSpace(str: String) {
-    return str === null || str.match(/^ *$/) !== null; 
+    return str == undefined || str === null || str.match(/^ *$/) !== null; 
 }

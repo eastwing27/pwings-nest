@@ -8,7 +8,7 @@ export class User {
     id: number;
 
     @Column()
-    name: string;
+    name: string = '';
 
     @Column()
     email: string;
@@ -17,7 +17,7 @@ export class User {
     password: string;
 
     @Column()
-    balance: number;
+    balance: number = 0;
 
     @OneToMany(type => Transaction, Transaction => Transaction.sender)
     outgoingTransactions: Transaction[];
