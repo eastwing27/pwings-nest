@@ -13,6 +13,12 @@ export class UserService {
     ) {}
 
     findAll(): Promise<User[]> { return this.repository.find(); }
+    
+    findSome(searchString: string): Promise<User[]> { 
+        return this.repository.createQueryBuilder('user')
+            .where(`user.email LIKE '%${searchString}%' OR user.name LIKE '%${searchString}%'`)
+            .execute();
+    }
 
     find(promise: Promise<User>): Promise<User|string> { 
         return new Promise<User> (async (resolve, reject) => { 

@@ -14,7 +14,15 @@ export class UserController {
         return await this.userService.findAll()
             .then(
                 docs => response.status(200).send(docs),
-                err => response.status(400).send({message: err}));
+                err => response.status(400).send({message: err.message || err}));
+    }
+
+    @Get('search/:searchString')
+    async getSome(@Param() params, @Res() response) {
+        return await this.userService.findSome(params.searchString)
+            .then(
+                docs => response.status(200).send(docs),
+                err => response.status(400).send({message: err.message || err}));
     }
 
     @Get(':id')
