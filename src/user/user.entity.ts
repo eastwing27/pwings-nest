@@ -22,6 +22,6 @@ export class User {
     @OneToMany(type => Transaction, Transaction => Transaction.sender)
     outgoingTransactions: Transaction[];
 
-    @OneToMany(type => Transaction, Transaction => Transaction.reciever)
+    @OneToMany(type => Transaction, Transaction => Transaction.receiver)
     incomingTransactions: Transaction[];
 }

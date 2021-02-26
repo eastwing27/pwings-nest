@@ -16,5 +16,5 @@ export class Transaction {
     sender: User;
     
     @ManyToOne(type => User, User => User.incomingTransactions)
-    reciever: User;
+    receiver: User;
 }
